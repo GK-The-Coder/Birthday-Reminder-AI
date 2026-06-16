@@ -7,6 +7,7 @@ import StatsCard from "../components/StatsCard";
 import SearchBar from "../components/SearchBar";
 import EditBirthdayModal from "../components/EditBirthdayModal";
 import EmailLogs from "../components/EmailLogs";
+import Footer from "../components/Footer";
 
 import { getBirthdays, getStats, getLogs } from "../services/birthdayApi";
 
@@ -144,6 +145,8 @@ function Dashboard() {
           />
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }
