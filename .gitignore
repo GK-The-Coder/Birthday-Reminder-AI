@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyt
+*.pyd
+*.pyo
+*.env
+.env*
+venv/
+backend/venv/
+.python-version
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Vite / build outputs
+frontend/dist/
+frontend/.vite/
+frontend/build/
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Misc
+coverage/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# GitHub workflows cache / temporary
+*.tmp
+*.temp
