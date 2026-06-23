@@ -13,15 +13,18 @@ from email_service import send_email
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+    "https://birthday-reminder-ai.vercel.app"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-                   "https://birthday-reminder-ai.vercel.app"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/")
 def home():
