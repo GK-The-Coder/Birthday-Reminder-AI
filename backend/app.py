@@ -15,7 +15,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
-    "https://birthday-reminder-ai.vercel.app"
+    "https://birthday-reminder-ai.vercel.app",
+    "https://birthday-reminder-ai-git-main-gk-the-coders-projects.vercel.app"
 ]
 
 app.add_middleware(
