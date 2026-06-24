@@ -1,12 +1,6 @@
-# email_service.py
-
 import os
 import smtplib
-
 from email.mime.text import MIMEText
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def send_email(receiver, subject, body):
 
@@ -14,17 +8,14 @@ def send_email(receiver, subject, body):
     password = os.getenv("EMAIL_PASSWORD")
 
     msg = MIMEText(body)
-
     msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = receiver
 
-    server = smtplib.SMTP(
+    server = smtplib.SMTP_SSL(
         "smtp.gmail.com",
-        587
+        465
     )
-
-    server.starttls()
 
     server.login(sender, password)
 
