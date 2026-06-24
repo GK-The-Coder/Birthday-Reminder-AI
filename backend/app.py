@@ -94,17 +94,32 @@ def generate_wish(data: WishRequest):
 
 @app.post("/send-birthday-email")
 def send_birthday_email(data: EmailRequest, user=Depends(get_current_user)):
-    wish = generate_birthday_message(data.name)
-    send_email(data.email, "Happy Birthday 🎂", wish)
-    email_logs_collection.insert_one({
-        "userId": user["userId"],
-        "name": data.name,
-        "email": data.email,
-        "status": "sent",
-        "timestamp": datetime.now(),
-    })
-    return {"message": "Email Sent Successfully"}
+    try:
+        wish = generate_birthday_message(data.name)
 
+        send_email(
+            data.email,
+            "Happy Birthday 🎂",
+            wish
+        )
+
+        email_logs_collection.insert_one({
+            "userId": user["userId"],
+            "name": data.name,
+            "email": data.email,
+            "status": "sent",
+            "timestamp": datetime.now(),
+        })
+
+        return {"message": "Email Sent Successfully"}
+
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 @app.get("/stats")
 def get_stats(user=Depends(get_current_user)):
