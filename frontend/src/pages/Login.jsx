@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 function Login() {
   const { login, token } = useAuth();
@@ -18,7 +18,8 @@ function Login() {
     setError("");
     try {
       await login(form);
-    } catch (err) {
+    } catch (error) {
+      console.error("Login error:", error);
       setError("Login failed. Check credentials.");
     }
   };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 function Register() {
   const { register, token } = useAuth();
@@ -20,7 +20,8 @@ function Register() {
     try {
       await register(form);
       setSuccess(true);
-    } catch (err) {
+    } catch (error) {
+      console.error("Registration error:", error);
       setError("Registration failed. Try again.");
     }
   };

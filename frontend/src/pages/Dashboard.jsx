@@ -46,9 +46,15 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    loadBirthdays();
-    loadStats();
-    loadLogs();
+    const fetchData = async () => {
+      await Promise.all([
+        loadBirthdays(),
+        loadStats(),
+        loadLogs()
+      ]);
+    };
+
+    fetchData();
   }, []);
 
   const upcomingBirthday = useMemo(() => {

@@ -1,7 +1,11 @@
+import os
 from passlib.context import CryptContext
 from jose import jwt
+from dotenv import load_dotenv
 
-SECRET_KEY = "super-secret-key"
+load_dotenv()
+
+SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key")
 ALGORITHM = "HS256"
 
 pwd_context = CryptContext(

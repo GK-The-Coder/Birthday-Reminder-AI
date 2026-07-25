@@ -1,7 +1,11 @@
+import os
 from jose import jwt
 from fastapi import Header, HTTPException
+from dotenv import load_dotenv
 
-SECRET_KEY = "super-secret-key"
+load_dotenv()
+
+SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key")
 ALGORITHM = "HS256"
 
 
