@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from datetime import datetime
+import os
 
 from dependencies import get_current_user
 from database import birthdays_table, email_logs_table, users_table
@@ -36,11 +37,13 @@ async def handle_unexpected_error(_request: Request, exc: Exception):
         content={"detail": "An unexpected server error occurred."},
     )
 
-origins = [
+default_origins = ",".join([
     "http://localhost:5173",
-    "https://birthday-reminder-ai.vercel.app",
-    "https://birthday-reminder-ai-git-main-gk-the-coders-projects.vercel.app"
-]
+    "https://wish-mate.vercel.app",
+])
+origins = [origin.strip() for origin in os.getenv(
+    "CORS_ORIGINS", default_origins
+).split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,5 +1,13 @@
 # Deployment
 
+Set `CORS_ORIGINS` in the backend environment to the exact frontend origin, for example:
+
+```env
+CORS_ORIGINS=https://your-wishmate.vercel.app
+```
+
+For multiple frontend origins, separate them with commas and do not add trailing slashes.
+
 ## Backend
 
 Build and run the backend from the `backend` directory:
