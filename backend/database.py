@@ -1,17 +1,18 @@
-from pymongo import MongoClient
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from supabase import Client, create_client
 
 load_dotenv()
 
-client = MongoClient(
-    os.getenv("MONGO_URI")
-)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-db = client["birthdayDB"]
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be configured")
 
-birthdays_collection = db["birthdays"]
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-email_logs_collection = db["email_logs"]
-
-users_collection = db["users"]
+birthdays_table = supabase.table("birthdays")
+email_logs_table = supabase.table("email_logs")
+users_table = supabase.table("users")

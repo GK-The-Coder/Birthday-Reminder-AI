@@ -31,7 +31,7 @@ function Register() {
       <div className="auth-card auth-card--dark">
         <div className="auth-header">
           <h2>Create your account</h2>
-          <p>Get started with Birthday Reminder AI in seconds.</p>
+          <p>Get started with WishMate in seconds.</p>
         </div>
 
         {success ? (

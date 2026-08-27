@@ -40,7 +40,7 @@ function Login() {
         </form>
 
         <p className="auth-footer">
-          New to Birthday Reminder AI? <Link to="/register">Create account</Link>
+          New to WishMate? <Link to="/register">Create account</Link>
         </p>
       </div>
     </div>

@@ -1,15 +1,17 @@
-from pydantic import BaseModel, EmailStr
+from datetime import date
+
+from pydantic import BaseModel, EmailStr, Field
 
 
 class Birthday(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=100)
     email: EmailStr
-    birthday: str
+    birthday: date
 
 
 class WishRequest(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=100)
 
 class EmailRequest(BaseModel):
-    name: str
-    email: str
+    name: str = Field(min_length=1, max_length=100)
+    email: EmailStr

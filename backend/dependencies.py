@@ -1,12 +1,6 @@
-import os
-from jose import jwt
 from fastapi import Header, HTTPException
-from dotenv import load_dotenv
 
-load_dotenv()
-
-SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key")
-ALGORITHM = "HS256"
+from database import supabase
 
 
 def get_current_user(
@@ -20,24 +14,19 @@ def get_current_user(
             detail="Token Missing"
         )
 
-    try:
-
-        token = authorization.replace(
-            "Bearer ",
-            ""
-        )
-
-        payload = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM]
-        )
-
-        return payload
-
-    except Exception:
-
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token:
         raise HTTPException(
             status_code=401,
             detail="Invalid Token"
         )
+
+    try:
+        authenticated_user = supabase.auth.get_user(token).user
+        return {
+            "userId": str(authenticated_user.id),
+            "email": authenticated_user.email,
+            "name": (authenticated_user.user_metadata or {}).get("name"),
+        }
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid Token")

@@ -1,104 +1,75 @@
-from apscheduler.schedulers.background import (
-    BackgroundScheduler
-)
+import logging
+import os
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
-from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 
-from database import (
-    birthdays_collection,
-    email_logs_collection
-)
+from ai_service import generate_birthday_message
+from database import birthdays_table, email_logs_table
+from email_service import send_email
 
-from ai_service import (
-    generate_birthday_message
-)
-
-from email_service import (
-    send_email
-)
+logger = logging.getLogger(__name__)
+SCHEDULER_TIMEZONE = os.getenv("SCHEDULER_TIMEZONE", "UTC")
+scheduler = BackgroundScheduler(timezone=ZoneInfo(SCHEDULER_TIMEZONE))
 
 
 def send_daily_birthday_wishes():
-
-    today = datetime.now()
-
-    current_date = today.strftime(
-        "%m-%d"
-    )
-
-    birthdays = (
-        birthdays_collection.find()
-    )
+    today = datetime.now(ZoneInfo(SCHEDULER_TIMEZONE))
+    delivery_date = today.date()
+    birthdays = birthdays_table.select(
+        "id, name, email, birthday, user_id"
+    ).execute().data
 
     for person in birthdays:
+        birthday_date = date.fromisoformat(person["birthday"])
+        if (birthday_date.month, birthday_date.day) != (today.month, today.day):
+            continue
 
-        birthday = (
-            person["birthday"]
-        )
+        already_sent = email_logs_table.select("id").eq(
+            "birthday_id", person["id"]
+        ).eq("delivery_date", delivery_date.isoformat()).limit(1).execute().data
+        if already_sent:
+            logger.info("Birthday email already sent for %s", person["email"])
+            continue
 
-        birthday_date = (
-            datetime.strptime(
-                birthday,
-                "%Y-%m-%d"
-            )
-        )
-
-        person_date = (
-            birthday_date.strftime(
-                "%m-%d"
-            )
-        )
-
-        if person_date == current_date:
-
-            wish = (
-                generate_birthday_message(
-                    person["name"]
-                )
-            )
-
-            send_email(
-                person["email"],
-                "Happy Birthday 🎂",
-                wish
-            )
-
-            email_logs_collection.insert_one({
-
-                "name":
-                person["name"],
-
-                "email":
-                person["email"],
-
-                "status":
-                "sent",
-
-                "timestamp":
-                datetime.now()
-
-            })
-
-            print(
-                f"Email sent to "
-                f"{person['name']}"
-            )
+        try:
+            wish = generate_birthday_message(person["name"])
+            send_email(person["email"], "Happy Birthday 🎂", wish)
+            email_logs_table.insert({
+                "user_id": person["user_id"],
+                "birthday_id": person["id"],
+                "delivery_date": delivery_date.isoformat(),
+                "name": person["name"],
+                "email": person["email"],
+                "status": "sent",
+                "message": wish,
+                "timestamp": datetime.now(ZoneInfo(SCHEDULER_TIMEZONE)).isoformat(),
+            }).execute()
+            logger.info("Birthday email sent to %s", person["email"])
+        except Exception:
+            logger.exception("Birthday email failed for %s", person["email"])
 
 
-scheduler = (
-    BackgroundScheduler()
-)
+def start_scheduler():
+    if scheduler.running:
+        return
+    scheduler.add_job(
+        send_daily_birthday_wishes,
+        "cron",
+        hour=8,
+        minute=0,
+        id="daily-birthday-wishes",
+        replace_existing=True,
+        coalesce=True,
+        max_instances=1,
+        misfire_grace_time=3600,
+    )
+    scheduler.start()
+    logger.info("Birthday scheduler started with timezone %s", SCHEDULER_TIMEZONE)
 
-scheduler.add_job(
 
-    send_daily_birthday_wishes,
-
-    "cron",
-
-    hour=8,
-
-    minute=0
-
-)
-
-scheduler.start()
+def stop_scheduler():
+    if scheduler.running:
+        scheduler.shutdown(wait=True)
+        logger.info("Birthday scheduler stopped")

@@ -9,7 +9,7 @@ function Navbar() {
       <div className="navbar-brand">
         <div className="brand-mark">🎂</div>
         <div>
-          <h1>Birthday Reminder AI</h1>
+          <h1>WishMate</h1>
           <p>Premium birthday tracking and celebration automation.</p>
         </div>
       </div>

@@ -17,6 +17,8 @@ function Dashboard() {
   const [selectedBirthday, setSelectedBirthday] = useState(null);
   const [stats, setStats] = useState({});
   const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const loadBirthdays = async () => {
     try {
@@ -24,6 +26,7 @@ function Dashboard() {
       setBirthdays(response.data);
     } catch (error) {
       console.error("Failed to load birthdays", error);
+      setError("Unable to load birthdays. Please try again.");
     }
   };
 
@@ -33,6 +36,7 @@ function Dashboard() {
       setStats(response.data);
     } catch (error) {
       console.error("Failed to load stats", error);
+      setError("Unable to load dashboard statistics.");
     }
   };
 
@@ -42,16 +46,14 @@ function Dashboard() {
       setLogs(response.data);
     } catch (error) {
       console.error("Failed to load logs", error);
+      setError("Unable to load email history.");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([
-        loadBirthdays(),
-        loadStats(),
-        loadLogs()
-      ]);
+      await Promise.all([loadBirthdays(), loadStats(), loadLogs()]);
+      setLoading(false);
     };
 
     fetchData();
@@ -72,9 +74,10 @@ function Dashboard() {
       <Navbar />
 
       <main className="container">
+        {error && <div className="form-error" role="alert">{error}</div>}
         <section className="hero-panel">
           <div>
-            <span className="eyebrow">Birthday Reminder AI</span>
+            <span className="eyebrow">WishMate</span>
             <h2>Your birthday command center</h2>
             <p>
               Manage celebrations, generate thoughtful wishes, and automate reminder emails from one premium dashboard.
@@ -116,6 +119,7 @@ function Dashboard() {
               </div>
               <SearchBar search={search} setSearch={setSearch} />
               <div className="birthday-grid">
+                {loading && <div className="empty-state">Loading birthdays...</div>}
                 {filteredBirthdays.length > 0 ? (
                   filteredBirthdays.map((birthday) => (
                     <BirthdayCard
@@ -125,7 +129,7 @@ function Dashboard() {
                       onEdit={setSelectedBirthday}
                     />
                   ))
-                ) : (
+                ) : !loading && (
                   <div className="empty-state">No birthdays found. Add your first reminder.</div>
                 )}
               </div>

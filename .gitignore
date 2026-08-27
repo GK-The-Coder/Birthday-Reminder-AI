@@ -12,6 +12,11 @@ __pycache__/
 venv/
 backend/venv/
 .python-version
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
 
 # Node
 node_modules/
@@ -28,6 +33,10 @@ frontend/dist/
 frontend/.vite/
 frontend/build/
 
+# Docker local overrides
+docker-compose.override.yml
+*.docker.env
+
 # Editor / OS
 .vscode/
 .DS_Store
@@ -43,6 +52,7 @@ yarn-debug.log*
 
 # Misc
 coverage/
+htmlcov/
 .env.local
 .env.development.local
 .env.test.local

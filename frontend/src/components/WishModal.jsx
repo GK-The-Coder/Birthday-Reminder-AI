@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { sendBirthdayEmail }
 from "../services/birthdayApi";
 
@@ -6,6 +7,8 @@ function WishModal({
   birthday,
   onClose,
 }) {
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
   const copyWish = () => {
 
@@ -21,7 +24,8 @@ function WishModal({
 
   const handleSend =
     async () => {
-
+      setError("");
+      setSending(true);
       try {
 
         await sendBirthdayEmail({
@@ -34,17 +38,13 @@ function WishModal({
 
         });
 
-        alert(
-          "Email Sent Successfully!"
-        );
+        alert("Email Sent Successfully!");
 
       } catch (error) {
-
         console.log(error);
-
-        alert(
-          "Failed to send email"
-        );
+        setError("Failed to send email. Please try again.");
+      } finally {
+        setSending(false);
 
       }
 
@@ -63,6 +63,7 @@ function WishModal({
         <div className="wish-content">
           {wish}
         </div>
+        {error && <div className="form-error" role="alert">{error}</div>}
 
         <div className="modal-buttons">
 
@@ -74,8 +75,9 @@ function WishModal({
 
           <button
             onClick={handleSend}
+            disabled={sending}
           >
-            Send Email
+            {sending ? "Sending..." : "Send Email"}
           </button>
 
           <button

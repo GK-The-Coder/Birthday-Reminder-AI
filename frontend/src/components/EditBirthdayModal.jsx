@@ -13,6 +13,8 @@ function EditBirthdayModal({
       birthday:
         birthday.birthday,
     });
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -25,15 +27,18 @@ function EditBirthdayModal({
   const handleSubmit =
     async (e) => {
       e.preventDefault();
-
-      await updateBirthday(
-        birthday._id,
-        formData
-      );
-
-      refresh();
-
-      onClose();
+      setError("");
+      setSaving(true);
+      try {
+        await updateBirthday(birthday._id, formData);
+        await refresh();
+        onClose();
+      } catch (error) {
+        console.error(error);
+        setError("Unable to update this birthday.");
+      } finally {
+        setSaving(false);
+      }
     };
 
   return (
@@ -44,6 +49,7 @@ function EditBirthdayModal({
         <h2>
           Edit Birthday
         </h2>
+        {error && <div className="form-error" role="alert">{error}</div>}
 
         <form
           onSubmit={
@@ -88,8 +94,9 @@ function EditBirthdayModal({
 
             <button
               type="submit"
+              disabled={saving}
             >
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
 
             <button

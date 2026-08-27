@@ -6,7 +6,7 @@ function Footer() {
           © 2026 <span className="footer-brand">GK-The-Coder</span>. All rights reserved.
         </p>
         <p className="footer-subtext">
-          Birthday Reminder AI • Built with FastAPI, React, and AI
+          WishMate • Built with FastAPI, React, and AI
         </p>
       </div>
     </footer>
