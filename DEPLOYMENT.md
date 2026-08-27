@@ -19,6 +19,16 @@ docker run --env-file .env -p 8000:8000 wishmate-api
 
 Keep the Supabase secret key, Groq key, email credentials, and JWT secret in the hosting provider's server-side environment settings.
 
+For Render, configure Gmail SMTP with STARTTLS:
+
+```env
+EMAIL_ADDRESS=your-gmail@gmail.com
+EMAIL_PASSWORD=your-gmail-app-password
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USE_SSL=false
+```
+
 Configure the deployment health checks as follows:
 
 - Liveness: `GET /health`
