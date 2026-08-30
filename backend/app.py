@@ -18,6 +18,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def get_frontend_base_url():
+    for env_name in ("FRONTEND_URL", "APP_URL", "SITE_URL", "PUBLIC_APP_URL"):
+        value = os.getenv(env_name)
+        if value:
+            return value.rstrip("/")
+    return "http://localhost:3000"
+
+
+def build_signup_options(name: str):
+    base_url = get_frontend_base_url()
+    return {
+        "data": {"name": name},
+        "email_redirect_to": f"{base_url}/login",
+    }
+
+
 def get_registration_status(auth_response):
     user = getattr(auth_response, "user", None)
     session = getattr(auth_response, "session", None)
@@ -217,7 +233,7 @@ def register(user: UserRegister):
         response = supabase.auth.sign_up({
             "email": user.email,
             "password": user.password,
-            "options": {"data": {"name": user.name}},
+            "options": build_signup_options(user.name),
         })
         if not response.user:
             raise HTTPException(status_code=400, detail="Registration failed")
