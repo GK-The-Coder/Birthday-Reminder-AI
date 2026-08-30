@@ -20,7 +20,8 @@ function Login() {
       await login(form);
     } catch (error) {
       console.error("Login error:", error);
-      setError("Login failed. Check credentials.");
+      const detail = error.response?.data?.detail || "Login failed. Check credentials.";
+      setError(detail);
     }
   };
 

@@ -7,6 +7,7 @@ function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   if (token) {
     return <Navigate to="/" replace />;
@@ -18,11 +19,14 @@ function Register() {
     e.preventDefault();
     setError("");
     try {
-      await register(form);
+      const response = await register(form);
+      const payload = response?.data || {};
       setSuccess(true);
+      setSuccessMessage(payload.message || "Registration successful! Please sign in.");
     } catch (error) {
       console.error("Registration error:", error);
-      setError("Registration failed. Try again.");
+      const detail = error.response?.data?.detail || "Registration failed. Try again.";
+      setError(detail);
     }
   };
 
@@ -36,7 +40,7 @@ function Register() {
 
         {success ? (
           <div className="auth-success">
-            Registration successful! <Link to="/login">Sign in now</Link>
+            {successMessage} {successMessage.includes("confirm") ? "" : <Link to="/login">Sign in now</Link>}
           </div>
         ) : (
           <form onSubmit={handleSubmit}>

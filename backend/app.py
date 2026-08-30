@@ -17,6 +17,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+def get_registration_status(auth_response):
+    user = getattr(auth_response, "user", None)
+    session = getattr(auth_response, "session", None)
+
+    if not user:
+        return {"requires_email_confirmation": False, "message": "Registration failed"}
+
+    if session:
+        return {"requires_email_confirmation": False, "message": "User Registered"}
+
+    return {
+        "requires_email_confirmation": True,
+        "message": "Registration successful. Please check your email and confirm your account before logging in.",
+    }
+
+
 @asynccontextmanager
 async def lifespan(_app):
     from scheduler import start_scheduler, stop_scheduler
@@ -204,16 +221,19 @@ def register(user: UserRegister):
         })
         if not response.user:
             raise HTTPException(status_code=400, detail="Registration failed")
-        users_table.insert({
+
+        users_table.upsert({
             "id": str(response.user.id),
             "name": user.name,
             "email": user.email,
-        }).execute()
+        }, on_conflict="id").execute()
+
+        status = get_registration_status(response)
+        return status
     except HTTPException:
         raise
     except Exception:
         raise HTTPException(status_code=400, detail="Email already exists or registration failed")
-    return {"message": "User Registered"}
 
 
 @app.post("/login")
@@ -224,7 +244,7 @@ def login(user: UserLogin):
             "password": user.password,
         })
         if not response.session:
-            raise HTTPException(status_code=401, detail="Email confirmation required")
+            raise HTTPException(status_code=401, detail="Please confirm your email before logging in.")
         return {"access_token": response.session.access_token}
     except HTTPException:
         raise
