@@ -43,6 +43,17 @@ def test_smtp_starttls_provider_starts_tls(monkeypatch):
     server.login.assert_called_once_with("sender@example.com", "app-password")
 
 
+def test_resend_provider_sends_expected_request(monkeypatch):
+    monkeypatch.setenv("EMAIL_PROVIDER", "resend")
+    monkeypatch.setenv("RESEND_API_KEY", "test-key")
+    monkeypatch.setenv("EMAIL_FROM", "WishMate <noreply@wishmate.app>")
+
+    with patch.object(email_service, "_send_via_resend", return_value=None) as send_via_resend:
+        email_service.send_email("alex@example.com", "Subject", "Body")
+
+    send_via_resend.assert_called_once_with("alex@example.com", "Subject", "Body")
+
+
 def test_smtp_credentials_are_required(monkeypatch):
     monkeypatch.delenv("EMAIL_ADDRESS", raising=False)
     monkeypatch.delenv("EMAIL_PASSWORD", raising=False)
